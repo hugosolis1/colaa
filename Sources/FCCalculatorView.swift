@@ -364,7 +364,7 @@ struct SquareOfNineTab: View {
                                 Text(String(format: "%.4f", lvl.price))
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(isBase ? .goldAccent : .silverAccent)
-                                    .fontWeight(isBase ? .bold : .regular)
+                                    .font(.system(size: 14, weight: isBase ? .bold : .regular))
                                 Text(lvl.axis)
                                     .frame(width: 80, alignment: .center)
                                     .foregroundColor(axisColor(lvl.axis))
