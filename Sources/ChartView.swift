@@ -3,6 +3,24 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+// MARK: - ScrollBackground Modifier (iOS 15 compatible)
+
+struct HideScrollBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, *) {
+            content.scrollContentBackground(.hidden)
+        } else {
+            content
+        }
+    }
+}
+
+extension View {
+    func hideScrollBackground() -> some View {
+        modifier(HideScrollBackground())
+    }
+}
+
 // MARK: - Chart State
 
 class ChartState: ObservableObject {
@@ -696,7 +714,7 @@ struct WavyListView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
+                .hideScrollBackground()   // ← fix: compatible con iOS 15 y 16+
             }
             .navigationTitle("Gestionar Wavys")
             .navigationBarTitleDisplayMode(.inline)
