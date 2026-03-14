@@ -326,50 +326,8 @@ struct CalcButton: View {
     }
 }
 
-struct PlanetMultiPicker: View {
-    @Binding var selected: Set<Planet>
-    var body: some View {
-        VStack(spacing: 6) {
-            HStack {
-                Button("Todo") { selected = Set(Planet.allCases) }.font(.system(size: 11)).foregroundColor(.goldAccent)
-                Spacer()
-                Button("Nada") { selected.removeAll() }.font(.system(size: 11)).foregroundColor(.dimText)
-            }.padding(.horizontal, 4)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 90))], spacing: 6) {
-                ForEach(Planet.allCases) { pl in
-                    let sel = selected.contains(pl)
-                    Button(action: { if sel { selected.remove(pl) } else { selected.insert(pl) } }) {
-                        HStack(spacing: 4) {
-                            Text(pl.symbol).font(.system(size: 12))
-                            Text(pl.rawValue).font(.system(size: 10)).lineLimit(1)
-                        }
-                        .padding(.vertical, 5).padding(.horizontal, 6)
-                        .background(sel ? pl.swiftUIColor.opacity(0.2) : Color.spaceDark.opacity(0.5))
-                        .cornerRadius(7)
-                        .overlay(RoundedRectangle(cornerRadius: 7).stroke(sel ? pl.swiftUIColor : Color.dimText.opacity(0.3), lineWidth: 1))
-                        .foregroundColor(sel ? pl.swiftUIColor : .dimText)
-                    }
-                }
-            }
-        }
-        .padding(10).background(Color.spaceDeep.opacity(0.8)).cornerRadius(10)
-    }
-}
-
-struct TimezoneRow: View {
-    @AppStorage("tzOffset") var tzOffset: Double = Double(TimeZone.current.secondsFromGMT())/3600
-    var body: some View {
-        HStack {
-            Text("Zona Horaria").font(.system(size: 11, design: .monospaced)).foregroundColor(.dimText)
-            Spacer()
-            Text(String(format: "UTC%+.1f", tzOffset))
-                .font(.system(size: 13, weight: .semibold, design: .monospaced)).foregroundColor(.silverAccent)
-            Stepper("", value: $tzOffset, in: -12...14, step: 0.5).labelsHidden()
-                .onChange(of: tzOffset) { AppState.shared.timezone = $0 }
-        }
-        .padding(12).background(Color.spaceMid.opacity(0.4)).cornerRadius(8)
-    }
-}
+// MARK: - NOTE: PlanetMultiPicker is defined in DegreesView.swift
+// MARK: - NOTE: TimezoneRow is defined in PositionsView.swift
 
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
