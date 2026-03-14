@@ -1,0 +1,58 @@
+workflows:
+  ios-unsigned:
+    name: AstroWavy iOS Unsigned IPA
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      xcode: latest
+    scripts:
+      - name: Create assets
+        script: |
+          set -e
+          mkdir -p Assets.xcassets/AppIcon.appiconset Assets.xcassets/AccentColor.colorset
+          echo '{"images":[],"info":{"author":"xcode","version":1}}' > Assets.xcassets/AppIcon.appiconset/Contents.json
+          echo '{"colors":[{"color":{"color-space":"srgb","components":{"alpha":"1","blue":"0","green":"0.84","red":"1"}},"idiom":"universal"}],"info":{"author":"xcode","version":1}}' > Assets.xcassets/AccentColor.colorset/Contents.json
+          echo '{"info":{"author":"xcode","version":1}}' > Assets.xcassets/Contents.json
+
+      - name: Generate Xcode project
+        script: |
+          set -e
+          brew install xcodegen
+          xcodegen generate --spec project.yml
+          echo "✅ Proyecto generado"
+          find . -name "*.xcodeproj" -type d
+
+      - name: Build archive
+        script: |
+          set -e
+          XCODEPROJ=$(find . -maxdepth 2 -name "*.xcodeproj" -type d | head -1)
+          SCHEME=$(basename "$XCODEPROJ" .xcodeproj)
+          echo "Proyecto: $XCODEPROJ | Scheme: $SCHEME"
+          xcodebuild archive \
+            -project "$XCODEPROJ" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$CM_BUILD_DIR/AstroWavy.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            DEVELOPMENT_TEAM="" \
+            ASSETCATALOG_COMPILER_APPICON_NAME="" \
+            SKIP_INSTALL=NO
+
+      - name: Package IPA
+        script: |
+          set -e
+          APP=$(find "$CM_BUILD_DIR/AstroWavy.xcarchive" -name "*.app" -type d | head -1)
+          echo "App: $APP"
+          mkdir -p "$CM_BUILD_DIR/Payload"
+          cp -R "$APP" "$CM_BUILD_DIR/Payload/"
+          cd "$CM_BUILD_DIR"
+          zip -r "AstroWavy_unsigned.ipa" Payload/
+          ls -lh AstroWavy_unsigned.ipa
+          cp "$CM_BUILD_DIR/AstroWavy_unsigned.ipa" "$GITHUB_WORKSPACE/"
+
+    artifacts:
+      - $CM_BUILD_DIR/AstroWavy_unsigned.ipa
