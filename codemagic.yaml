@@ -52,7 +52,6 @@ workflows:
           cd "$CM_BUILD_DIR"
           zip -r "AstroWavy_unsigned.ipa" Payload/
           ls -lh AstroWavy_unsigned.ipa
-          cp "$CM_BUILD_DIR/AstroWavy_unsigned.ipa" "$GITHUB_WORKSPACE/"
 
     artifacts:
       - $CM_BUILD_DIR/AstroWavy_unsigned.ipa
